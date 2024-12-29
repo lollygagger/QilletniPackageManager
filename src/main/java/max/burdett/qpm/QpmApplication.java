@@ -1,14 +1,28 @@
-package main.java.max.burdett.qpm;
-import main.java.max.burdett.qpm.command.fetch.CommandFetch;
-import main.java.max.burdett.qpm.command.init.CommandInit;
-import main.java.max.burdett.qpm.command.lock.CommandLock;
+package max.burdett.qpm;
+import max.burdett.qpm.command.fetch.CommandFetch;
+import max.burdett.qpm.command.lock.CommandLock;
 import picocli.CommandLine;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-@CommandLine.Command(name = "qpm", subcommands = {CommandInit.class, CommandLock.class, CommandFetch.class})
+@CommandLine.Command(name = "qpm", subcommands = {CommandLock.class, CommandFetch.class})
 public class QpmApplication {
 
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(QpmApplication.class);
+
+    @CommandLine.Option(names = {"-h", "--help"}, usageHelp = true, description = "Display a help message")
+    private boolean helpRequested = false;
+
     public static void main(String[] args) {
-        System.out.println("Hello World");
+        var application = new QpmApplication();
+
+        if (args.length == 0) {
+            LOGGER.error("Invalid Command");
+            return;
+        }
+
+        new CommandLine(application).execute(args);
     }
 
 }
