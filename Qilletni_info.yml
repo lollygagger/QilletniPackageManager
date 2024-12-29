@@ -1,0 +1,7 @@
+name: demo_library
+version: 1.0.0
+author: Adam Yarris
+dependencies:
+  - foo:^1.2.3  # 1.0.0 or newer minor/patch releases
+  - baz:~2.4.5  # 2.4.5 or newer patch releases
+  - bar:0.1.16  # Exactly 0.1.16
