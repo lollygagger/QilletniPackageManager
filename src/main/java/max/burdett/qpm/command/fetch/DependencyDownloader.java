@@ -7,6 +7,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import is.yarr.qilletni.api.lib.qll.QilletniInfoData;
 
 public class DependencyDownloader {
@@ -19,25 +21,25 @@ public class DependencyDownloader {
      * @param saveDir
      * @throws IOException
      */
-    public static void downloadPackage(QilletiInfoData dependency, Path saveDir) throws IOException {
+    public static void downloadPackage(QilletniInfoData dependency, Path saveDir) throws IOException {
         // Send the request to the API to get the signed URL
-        String signedUrl = getSignedUrlFromApi(dependency.name, dependency.version.getVersionString);
+        String signedUrl = getSignedUrlFromApi(dependency);
 
         if (signedUrl != null) {
             // Create the target directory path
-            Path targetDir = Paths.get(saveDir, dependency.name, dependency.version.getVersionString);
+            Path targetDir = Paths.get(saveDir.toString(), dependency.name(), dependency.version().getVersionString());
             Files.createDirectories(targetDir);  // Ensure the directory exists
 
             // Download the package using the signed URL
-            downloadFile(signedUrl, targetDir.resolve(dependency.name + "-" + dependency.version.getVersionString + ".pkg").toString());
+            downloadFile(signedUrl, targetDir.resolve(dependency.name() + "-" + dependency.version().getVersionString() + ".pkg").toString());
         } else {
             System.out.println("No signed URL received from the API.");
         }
     }
 
-    private static String getSignedUrlFromApi(QilletiInfoData dependency) throws IOException {
+    private static String getSignedUrlFromApi(QilletniInfoData dependency) throws IOException {
         // Create URL object from the API endpoint
-        URL url = new URL(API_URL + "?package=" + dependency.name + "&version=" + dependency.version.getVersionString);
+        URL url = new URL(API_URL + "?package=" + dependency.name() + "&version=" + dependency.version().getVersionString());
 
         // Send the HTTP GET request
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -62,7 +64,7 @@ public class DependencyDownloader {
                 // Assuming the response JSON contains a field called "signedUrl"
                 String responseJson = response.toString();
 
-                return extractSignedUrl(responseJson);;
+                return extractSignedUrl(responseJson);
             }
         } else {
             System.out.println("API request failed with response code: " + responseCode);

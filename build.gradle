@@ -30,6 +30,10 @@ repositories {
     }
 
     mavenCentral()
+
+    println("TEST TEST TEST:")
+    println(System.getenv("GITHUB_USR"))
+    println(System.getenv("PROJECT_PAT"))
 }
 
 dependencies {
