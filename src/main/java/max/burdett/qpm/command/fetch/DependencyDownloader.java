@@ -9,19 +9,25 @@ import java.nio.file.Paths;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import is.yarr.qilletni.api.lib.qll.QilletniInfoData;
+
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 public class DependencyDownloader {
 
     private static final String API_URL = "";
 
+    private static final OkHttpClient client = new OkHttpClient();
+
+
     /**
-     * downloadPackage takes in a QilletniInfoData dependency and downloads
+     * downloadPackage takes in a ExactDependency dependency and downloads it
      * @param dependency
      * @param saveDir
      * @throws IOException
      */
-    public static void downloadPackage(QilletniInfoData dependency, Path saveDir) throws IOException {
+    public static void downloadPackage(ExactDependency dependency, Path saveDir) throws IOException {
         // Send the request to the API to get the signed URL
         String signedUrl = getSignedUrlFromApi(dependency);
 
@@ -37,38 +43,35 @@ public class DependencyDownloader {
         }
     }
 
-    private static String getSignedUrlFromApi(QilletniInfoData dependency) throws IOException {
+    /**
+     * getSignedUrlFromApi generates signed URLs for downloading packages from R2
+     * @param dependency the ExactDependency to generate a signed URL for downloading
+     * @return a signed URL which can be used to download the ExactDependency
+     * @throws IOException
+     */
+    private static String getSignedUrlFromApi(ExactDependency dependency) throws IOException {
         // Create URL object from the API endpoint
-        URL url = new URL(API_URL + "?package=" + dependency.name() + "&version=" + dependency.version().getVersionString());
+        String url = API_URL + "?package=" + dependency.name() + "&version=" + dependency.version().getVersionString();
+
+        // Build the request
+        Request request = new Request.Builder()
+                .url(url)
+                .get()
+                .addHeader("Accept", "application/json")
+                .build();
 
         // Send the HTTP GET request
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestMethod("GET");
-        connection.setDoOutput(true);
-        connection.setRequestProperty("Accept", "application/json");
+        try (Response response = client.newCall(request).execute()) {
+            if (response.isSuccessful()) {
+                // Read the response body as a string
+                String responseJson = response.body().string();
 
-        // Check for successful response
-        int responseCode = connection.getResponseCode();
-        if (responseCode == HttpURLConnection.HTTP_OK) {
-            // Parse the JSON response (simplified here for demonstration)
-            try (InputStreamReader reader = new InputStreamReader(connection.getInputStream());
-                 BufferedReader in = new BufferedReader(reader)) {
-
-                String inputLine;
-                StringBuilder response = new StringBuilder();
-
-                while ((inputLine = in.readLine()) != null) {
-                    response.append(inputLine);
-                }
-
-                // Assuming the response JSON contains a field called "signedUrl"
-                String responseJson = response.toString();
-
+                // Extract and return the signed URL from the response JSON
                 return extractSignedUrl(responseJson);
+            } else {
+                System.out.println("API request failed with response code: " + response.code());
+                return null;
             }
-        } else {
-            System.out.println("API request failed with response code: " + responseCode);
-            return null;
         }
     }
 
