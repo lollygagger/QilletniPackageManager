@@ -1,4 +1,4 @@
-package max.burdett.qpm.command.fetch;
+package max.burdett.qpm.util.download;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -10,6 +10,7 @@ import java.nio.file.Paths;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import max.burdett.qpm.util.ExactDependency;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -40,6 +41,31 @@ public class DependencyDownloader {
             downloadFile(signedUrl, targetDir.resolve(dependency.name() + "-" + dependency.version().getVersionString() + ".pkg").toString());
         } else {
             System.out.println("No signed URL received from the API.");
+        }
+    }
+
+    /**
+     * Downloads a file to a given target path
+     * @param fileUrl A pre-signed url to download the file
+     * @param targetPath The path where the file should be downloaded to
+     * @throws IOException
+     */
+    private static void downloadFile(String fileUrl, String targetPath) throws IOException {
+        URL url = new URL(fileUrl);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("GET");
+
+        // Open an input stream to the file
+        try (InputStream in = connection.getInputStream();
+             FileOutputStream out = new FileOutputStream(targetPath)) {
+
+            byte[] buffer = new byte[4096];
+            int bytesRead;
+
+            while ((bytesRead = in.read(buffer)) != -1) {
+                out.write(buffer, 0, bytesRead);
+            }
+            System.out.println("Package downloaded successfully to: " + targetPath);
         }
     }
 
@@ -87,22 +113,4 @@ public class DependencyDownloader {
         return null;
     }
 
-    private static void downloadFile(String fileUrl, String targetPath) throws IOException {
-        URL url = new URL(fileUrl);
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestMethod("GET");
-
-        // Open an input stream to the file
-        try (InputStream in = connection.getInputStream();
-             FileOutputStream out = new FileOutputStream(targetPath)) {
-
-            byte[] buffer = new byte[4096];
-            int bytesRead;
-
-            while ((bytesRead = in.read(buffer)) != -1) {
-                out.write(buffer, 0, bytesRead);
-            }
-            System.out.println("Package downloaded successfully to: " + targetPath);
-        }
-    }
 }

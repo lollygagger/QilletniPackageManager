@@ -19,6 +19,8 @@ public class QpmApplication {
     public static void main(String[] args) {
         var application = new QpmApplication();
 
+//        Dotenv dotenv = Dotenv.load();
+
         System.out.println("HELLO WORLD");
 
         CommandLock lock = new CommandLock();

@@ -1,6 +1,6 @@
 package max.burdett.qpm.command.lock;
 
-import is.yarr.qilletni.api.lib.qll.QilletniInfoData;
+import dev.qilletni.api.lib.qll.QilletniInfoData;
 
 public class LockFileGenerator {
     /**

@@ -1,5 +1,7 @@
-package max.burdett.qpm.command.fetch;
+package max.burdett.qpm.util.download;
 
+
+import max.burdett.qpm.util.ExactDependency;
 
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -14,18 +16,16 @@ public class DependencyManager {
     // Method to resolve dependencies concurrently
 
     /**
-     * resolveDependencies manages the process of resolving the needed dependencies. This method acts as an orchestrator
+     * resolveDependencies manages the process of downloading the needed dependencies. This method acts as an orchestrator
      * to download all the required dependencies at the same time.
      *
-     * @param requiredDependencies A set
+     * @param requiredDependencies A set containg all the {@link ExactDependency} needed
      * @return A map containing the dependency object as the key and the file location as the value
      * @throws IOException
-     * @throws InterruptedException
-     * @throws ExecutionException
      */
-    public static Map<ExactDependency, String> resolveDependencies(Set<ExactDependency> requiredDependencies) throws IOException, InterruptedException, ExecutionException {
-        String qilDir = System.getProperty("user.home") + "/.Qilletni";
-        Map<ExactDependency, String> satisfiedDependencies = checkExistingDependencies(qilDir, requiredDependencies);
+    public static Map<ExactDependency, String> resolveDependencies(Set<ExactDependency> requiredDependencies) throws IOException{
+        String qilDir = System.getProperty("user.home") + "/.Qilletni/packages";
+        Map<ExactDependency, String> satisfiedDependencies = checkExistingDependencies(requiredDependencies);
 
         // Executor for concurrent downloading
         ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
@@ -49,10 +49,16 @@ public class DependencyManager {
         return satisfiedDependencies;
     }
 
-    // Check for existing dependencies in ~/.Qil directory
-    public static Map<ExactDependency, String> checkExistingDependencies(String qilDir, Set<ExactDependency> requiredDependencies) throws IOException {
+
+    /**
+     * Checks for existing dependencies in ~/.Qilletni/packages
+     * @param requiredDependencies a set of {@link ExactDependency} objects to check locally for
+     * @return a map containing the found dependencies mapped to their location on the local filesystem
+     * @throws IOException
+     */
+    public static Map<ExactDependency, String> checkExistingDependencies(Set<ExactDependency> requiredDependencies) throws IOException {
         Map<ExactDependency, String> satisfiedDependencies = new HashMap<>();
-        Path qilPath = Paths.get(System.getProperty("user.home"), ".Qilletni");
+        Path qilPath = Paths.get(System.getProperty("user.home"), "/.Qilletni/packages");
 
         // Iterate over each required dependency and check if the file exists
         for (ExactDependency dep : requiredDependencies) {
