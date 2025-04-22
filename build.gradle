@@ -27,13 +27,8 @@ repositories {
             username = System.getenv("GITHUB_USR")
             password = System.getenv("PROJECT_PAT")
         }
-    }
-
+    }q
     mavenCentral()
-
-    println("TEST TEST TEST:")
-    println(System.getenv("GITHUB_USR"))
-    println(System.getenv("PROJECT_PAT"))
 }
 
 dependencies {
@@ -41,7 +36,7 @@ dependencies {
     annotationProcessor 'info.picocli:picocli-codegen:4.7.5'
 
     //for API calls/responses
-    implementation 'com.google.code.gson:gson:2.8.8'
+    implementation 'com.google.code.gson:gson:2.8.9'
     implementation 'com.squareup.okhttp3:okhttp:4.9.3'
 
     // SLF4J API dependency
@@ -53,14 +48,10 @@ dependencies {
     implementation 'org.yaml:snakeyaml:2.0'
 
     //Qilletni for obvious reasons
-    implementation 'is.yarr.qilletni:qilletni:1.0.0-SNAPSHOT'
-    implementation 'is.yarr.qilletni:qilletni:1.0.0-SNAPSHOT:sources'
+    implementation 'dev.qilletni.impl:qilletni:1.0.0-SNAPSHOT'
+    implementation 'dev.qilletni.impl:qilletni:1.0.0-SNAPSHOT:sources'
 
-    implementation 'is.yarr.qilletni.api:qilletni-api:1.0.0-SNAPSHOT'
-
-//    we still need the qilletni toolchain or wherever the manifest parser is located
-
-
+    implementation 'dev.qilletni.api:qilletni-api:1.0.0-SNAPSHOT'
 
 }
 
